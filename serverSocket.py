@@ -15,6 +15,13 @@ server_socket.listen(0)
 clientsocket, address = server_socket.accept()
 connection = clientsocket.makefile('rb')
 
+#Set up a window for cv2 to overwrite repeatedly
+cv2.namedWindow('videoplayer', cv2.WINDOW_NORMAL)
+
+#Global variable to determine whether to process this frame or not
+process_this_frame = True
+
+
 try:
   while True:
     image_len = struct.unpack('<L', connection.read(struct.calcsize('<L')))[0]
@@ -26,14 +33,19 @@ try:
     file_bytes = np.asarray(bytearray(image_stream.read()), dtype=np.uint8)
     img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
-    cv2.imshow('Frame', img)
-    cv2.waitKey()
+    if process_this_frame:
+      face_locations = face_recognition.face_locations(img)
 
-    # image = Image.open(image_stream)
-    # print('Image is %dx%d' % image.size)
-    # image.verify()
-    # print('Image is verified')
-    # Image.open(image_stream).save('./random', format='jpeg')
+    process_this_frame = not process_this_frame
+    
+    for (top, right, bottom, left) in face_locations:
+      cv2.rectangle(img, (left, top), (right, bottom), (0, 0, 255), 2)
+
+    cv2.imshow('videoplayer', img)
+    key = cv2.waitKey(1) & 0xFF
+
+    if key == ord("q"):
+      break
 
     
 except Exception as e:
@@ -41,12 +53,4 @@ except Exception as e:
 finally:
   clientsocket.close()
   server_socket.close()
-
-# image = face_recognition.load_image_file('./random')
-# face_locations = face_recognition.face_locations(image)
-
-# for (top, right, bottom, left) in face_locations:
-#   cv2.rectangle(image, (left, top), (right, bottom), (0, 0, 255), 2)
-
-# cv2.imshow('image', image)
-# cv2.waitKey()
+  cv2.destroyAllWindows()
