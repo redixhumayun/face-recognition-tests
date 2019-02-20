@@ -1,2 +1,4 @@
-/random
 /.vscode
+faces_dataset/
+/build
+/.DS_STORE
