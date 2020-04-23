@@ -26,10 +26,10 @@ for image_path in image_paths:
   #Convert the image from BGR to RGB color space because dlib and face_recognition use RGB
   #while cv2 use BGR
   image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-  face_location = face_recognition.face_locations(image_rgb)
-  face_encoding = face_recognition.face_encodings(image_rgb)
-  known_names.append(name)
-  known_encodings.append(face_encoding)
+  face_encodings = face_recognition.face_encodings(image_rgb)
+  for face_encoding in face_encodings:
+    known_names.append(name)
+    known_encodings.append(face_encoding)
 
 data = {"encodings": known_encodings, "names": known_names}
 f = open(args["output"], "wb")

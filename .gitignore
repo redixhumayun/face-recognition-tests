@@ -2,3 +2,7 @@
 faces_dataset/
 /build
 /.DS_STORE
+/bin
+/include
+/lib
+.Python
